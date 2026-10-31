@@ -17,7 +17,7 @@ permissions:
 
 concurrency:
   group: branch-protection-contract-${{ github.ref || github.run_id }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   enforce:
@@ -48,4 +48,6 @@ jobs:
             echo "missing required secret BRANCH_PROTECTION_TOKEN" >&2
             exit 1
           fi
-          GH_TOKEN="$token" bash scripts/ci/sync_main_branch_required_checks.sh --mode "${{ steps.mode.outputs.mode }}"
+          GH_TOKEN="$token" bash scripts/ci/sync_main_branch_required_checks.sh --mode "${STEPS_MODE_OUTPUTS_MODE}"
+        env:
+          STEPS_MODE_OUTPUTS_MODE: ${{ steps.mode.outputs.mode }}
