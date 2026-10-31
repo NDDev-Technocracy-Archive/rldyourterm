@@ -14,6 +14,15 @@ concurrency:
   # Obsolete pull-request heads are cancelled; a running main validation always completes.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+  CARGO_NET_RETRY: '5'
+  CARGO_INCREMENTAL: '0'
+  RUSTFLAGS: -D warnings
+  CI_RUST_TOOLCHAIN: 1.94.0
+  MSRV_RUST_TOOLCHAIN: 1.92.0
+
 jobs:
   check:
     name: Check (ubuntu)
@@ -136,7 +145,7 @@ jobs:
       - name: Lint and audit workflows
         run: |
           actionlint .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml
-          zizmor --offline --no-progress .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml
+          zizmor --offline --no-progress .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml .github/dependabot.yml
       - name: Scan new pull request commits, or the full history on main
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
