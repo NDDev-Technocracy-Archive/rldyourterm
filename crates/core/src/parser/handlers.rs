@@ -438,7 +438,7 @@ fn parse_rgb_triplet(spec: &str, separator: char) -> Option<(u8, u8, u8)> {
 
 fn parse_hash_triplet(spec: &str) -> Option<(u8, u8, u8)> {
     let component_len = spec.len() / 3;
-    if spec.is_empty() || spec.len() % 3 != 0 || !(1..=4).contains(&component_len) {
+    if spec.is_empty() || !spec.len().is_multiple_of(3) || !(1..=4).contains(&component_len) {
         return None;
     }
 

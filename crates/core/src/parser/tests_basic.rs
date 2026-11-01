@@ -130,8 +130,8 @@ fn parses_sgr_reset() {
     let actions = parser.feed(b"\x1b[0m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::from_slice(
-            &[Some(0)]
+        vec![ParserAction::SetGraphicsRendition(Box::new(
+            SgrParams::from_slice(&[Some(0)])
         ))]
     );
 }
@@ -142,8 +142,8 @@ fn parses_sgr_bold_red() {
     let actions = parser.feed(b"\x1b[1;31m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::from_slice(
-            &[Some(1), Some(31)]
+        vec![ParserAction::SetGraphicsRendition(Box::new(
+            SgrParams::from_slice(&[Some(1), Some(31)])
         ))]
     );
 }
@@ -154,8 +154,8 @@ fn parses_sgr_256_color() {
     let actions = parser.feed(b"\x1b[38;5;196m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::from_slice(
-            &[Some(38), Some(5), Some(196),]
+        vec![ParserAction::SetGraphicsRendition(Box::new(
+            SgrParams::from_slice(&[Some(38), Some(5), Some(196),])
         ))]
     );
 }
@@ -166,8 +166,8 @@ fn parses_sgr_truecolor() {
     let actions = parser.feed(b"\x1b[38;2;255;128;0m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::from_slice(
-            &[Some(38), Some(2), Some(255), Some(128), Some(0),]
+        vec![ParserAction::SetGraphicsRendition(Box::new(
+            SgrParams::from_slice(&[Some(38), Some(2), Some(255), Some(128), Some(0),])
         ))]
     );
 }
@@ -178,11 +178,11 @@ fn parses_sgr_colon_truecolor() {
     let actions = parser.feed(b"\x1b[38:2::255:128:0m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::from_params(
-            &[SgrParam::with_subparams(
+        vec![ParserAction::SetGraphicsRendition(Box::new(
+            SgrParams::from_params(&[SgrParam::with_subparams(
                 Some(38),
                 &[Some(2), None, Some(255), Some(128), Some(0)],
-            )]
+            )])
         ))]
     );
 }
@@ -193,8 +193,8 @@ fn parses_sgr_colon_underline_style() {
     let actions = parser.feed(b"\x1b[4:3m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::from_params(
-            &[SgrParam::with_subparams(Some(4), &[Some(3)])]
+        vec![ParserAction::SetGraphicsRendition(Box::new(
+            SgrParams::from_params(&[SgrParam::with_subparams(Some(4), &[Some(3)])])
         ))]
     );
 }

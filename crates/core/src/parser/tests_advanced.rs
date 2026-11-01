@@ -4,7 +4,7 @@
 use crate::events::{DisplayClearMode, IngestDegradeReason};
 
 use super::{
-    MAX_CSI_LEN, MAX_OSC_LEN, MAX_SGR_PARAMS, Parser, ParserAction, SgrParams, ShellMarkerKind,
+    MAX_CSI_LEN, MAX_OSC_LEN, MAX_SGR_PARAMS, Parser, ParserAction, ShellMarkerKind,
     StatusStringRequest,
 };
 
@@ -80,7 +80,7 @@ fn sgr_bare_m_means_reset() {
     let actions = parser.feed(b"\x1b[m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::default())]
+        vec![ParserAction::SetGraphicsRendition(Box::default())]
     );
 }
 

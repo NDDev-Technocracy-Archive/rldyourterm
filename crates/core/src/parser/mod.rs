@@ -207,7 +207,9 @@ pub enum ParserAction {
     CursorBackwardTab(u16),
     ClearDisplay(DisplayClearMode),
     ClearLine(LineClearMode),
-    SetGraphicsRendition(SgrParams),
+    /// Boxed: `SgrParams` is ~600 bytes and would otherwise set the size of
+    /// every action in the parser's scratch buffer (clippy::large_enum_variant).
+    SetGraphicsRendition(Box<SgrParams>),
     CursorSavePosition,
     CursorRestorePosition,
     SetCursorVisible(bool),
