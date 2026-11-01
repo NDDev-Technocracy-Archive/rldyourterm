@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 Danil Silantyev, Global CEO NDDev. on.nddev.it.com (OpenNetwork)
 
-use rldyourterm_core::SearchMatch;
+use rldyourterm_services::terminal::SearchMatch;
 use winit::dpi::PhysicalPosition;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -535,7 +535,7 @@ fn project_search_match_flat_range(
 #[cfg(test)]
 mod tests {
     use super::{GridPoint, InteractionState, PointerState, SearchState, SelectionRange};
-    use rldyourterm_core::SearchMatch;
+    use rldyourterm_services::terminal::SearchMatch;
     use winit::dpi::PhysicalPosition;
 
     #[test]

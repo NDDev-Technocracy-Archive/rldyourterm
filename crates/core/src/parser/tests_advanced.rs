@@ -4,7 +4,7 @@
 use crate::events::{DisplayClearMode, IngestDegradeReason};
 
 use super::{
-    MAX_CSI_LEN, MAX_OSC_LEN, MAX_SGR_PARAMS, Parser, ParserAction, SgrParams, ShellMarkerKind,
+    MAX_CSI_LEN, MAX_OSC_LEN, MAX_SGR_PARAMS, Parser, ParserAction, ShellMarkerKind,
     StatusStringRequest,
 };
 
@@ -80,7 +80,7 @@ fn sgr_bare_m_means_reset() {
     let actions = parser.feed(b"\x1b[m");
     assert_eq!(
         actions,
-        vec![ParserAction::SetGraphicsRendition(SgrParams::default())]
+        vec![ParserAction::SetGraphicsRendition(Box::default())]
     );
 }
 
@@ -709,6 +709,23 @@ fn osc_4_queries_and_sets_palette_entries() {
             },
         ]
     );
+}
+
+#[test]
+fn osc_4_hash_spec_with_multibyte_text_is_ignored_without_panicking() {
+    // A `#` spec is sliced into three equal byte runs; non-ASCII text once
+    // split a UTF-8 character and panicked (ClusterFuzzLite, parser_feed).
+    let mut parser = Parser::default();
+    for spec in ["#\u{e9}a", "#a\u{e9}\u{e9}a", "#ab\u{1f600}cdef\u{e9}"] {
+        let sequence = format!("\x1b]4;1;{spec}\x07");
+        let actions = parser.feed(sequence.as_bytes());
+        assert!(
+            !actions
+                .iter()
+                .any(|action| matches!(action, ParserAction::SetPaletteColor { .. })),
+            "non-hex spec {spec:?} must not set a palette entry: {actions:?}"
+        );
+    }
 }
 
 #[test]

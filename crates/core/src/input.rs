@@ -409,37 +409,41 @@ fn kitty_csi_u(
     sequence.into_bytes()
 }
 
+/// Final form of a kitty functional key; every form is a CSI sequence.
 enum KittyFunctionalKey {
-    CsiLetter(u8),
-    CsiTilde(u16),
-    CsiUnicode(u32),
+    /// `CSI 1;mods <letter>` (or `CSI <letter>` without modifiers).
+    Letter(u8),
+    /// `CSI <number>;mods ~`.
+    Tilde(u16),
+    /// `CSI <codepoint>;mods u`.
+    Unicode(u32),
 }
 
 fn kitty_functional_key(key: RuntimeKey) -> Option<KittyFunctionalKey> {
     match key {
-        RuntimeKey::Up => Some(KittyFunctionalKey::CsiLetter(b'A')),
-        RuntimeKey::Down => Some(KittyFunctionalKey::CsiLetter(b'B')),
-        RuntimeKey::Right => Some(KittyFunctionalKey::CsiLetter(b'C')),
-        RuntimeKey::Left => Some(KittyFunctionalKey::CsiLetter(b'D')),
-        RuntimeKey::End => Some(KittyFunctionalKey::CsiLetter(b'F')),
-        RuntimeKey::Home => Some(KittyFunctionalKey::CsiLetter(b'H')),
-        RuntimeKey::F(1) => Some(KittyFunctionalKey::CsiLetter(b'P')),
-        RuntimeKey::F(2) => Some(KittyFunctionalKey::CsiLetter(b'Q')),
-        RuntimeKey::F(3) => Some(KittyFunctionalKey::CsiLetter(b'R')),
-        RuntimeKey::F(4) => Some(KittyFunctionalKey::CsiLetter(b'S')),
-        RuntimeKey::Insert => Some(KittyFunctionalKey::CsiTilde(2)),
-        RuntimeKey::Delete => Some(KittyFunctionalKey::CsiTilde(3)),
-        RuntimeKey::PageUp => Some(KittyFunctionalKey::CsiTilde(5)),
-        RuntimeKey::PageDown => Some(KittyFunctionalKey::CsiTilde(6)),
-        RuntimeKey::F(5) => Some(KittyFunctionalKey::CsiTilde(15)),
-        RuntimeKey::F(6) => Some(KittyFunctionalKey::CsiTilde(17)),
-        RuntimeKey::F(7) => Some(KittyFunctionalKey::CsiTilde(18)),
-        RuntimeKey::F(8) => Some(KittyFunctionalKey::CsiTilde(19)),
-        RuntimeKey::F(9) => Some(KittyFunctionalKey::CsiTilde(20)),
-        RuntimeKey::F(10) => Some(KittyFunctionalKey::CsiTilde(21)),
-        RuntimeKey::F(11) => Some(KittyFunctionalKey::CsiTilde(23)),
-        RuntimeKey::F(12) => Some(KittyFunctionalKey::CsiTilde(24)),
-        RuntimeKey::F(index @ 13..=20) => Some(KittyFunctionalKey::CsiUnicode(
+        RuntimeKey::Up => Some(KittyFunctionalKey::Letter(b'A')),
+        RuntimeKey::Down => Some(KittyFunctionalKey::Letter(b'B')),
+        RuntimeKey::Right => Some(KittyFunctionalKey::Letter(b'C')),
+        RuntimeKey::Left => Some(KittyFunctionalKey::Letter(b'D')),
+        RuntimeKey::End => Some(KittyFunctionalKey::Letter(b'F')),
+        RuntimeKey::Home => Some(KittyFunctionalKey::Letter(b'H')),
+        RuntimeKey::F(1) => Some(KittyFunctionalKey::Letter(b'P')),
+        RuntimeKey::F(2) => Some(KittyFunctionalKey::Letter(b'Q')),
+        RuntimeKey::F(3) => Some(KittyFunctionalKey::Letter(b'R')),
+        RuntimeKey::F(4) => Some(KittyFunctionalKey::Letter(b'S')),
+        RuntimeKey::Insert => Some(KittyFunctionalKey::Tilde(2)),
+        RuntimeKey::Delete => Some(KittyFunctionalKey::Tilde(3)),
+        RuntimeKey::PageUp => Some(KittyFunctionalKey::Tilde(5)),
+        RuntimeKey::PageDown => Some(KittyFunctionalKey::Tilde(6)),
+        RuntimeKey::F(5) => Some(KittyFunctionalKey::Tilde(15)),
+        RuntimeKey::F(6) => Some(KittyFunctionalKey::Tilde(17)),
+        RuntimeKey::F(7) => Some(KittyFunctionalKey::Tilde(18)),
+        RuntimeKey::F(8) => Some(KittyFunctionalKey::Tilde(19)),
+        RuntimeKey::F(9) => Some(KittyFunctionalKey::Tilde(20)),
+        RuntimeKey::F(10) => Some(KittyFunctionalKey::Tilde(21)),
+        RuntimeKey::F(11) => Some(KittyFunctionalKey::Tilde(23)),
+        RuntimeKey::F(12) => Some(KittyFunctionalKey::Tilde(24)),
+        RuntimeKey::F(index @ 13..=20) => Some(KittyFunctionalKey::Unicode(
             KITTY_PUA_FUNCTION_KEY_BASE + u32::from(index - 13),
         )),
         _ => None,
@@ -454,21 +458,21 @@ fn encode_kitty_functional_key(
     let modifier_field = kitty_modifier_field(key_event.modifiers, event_type);
 
     match kitty_functional_key(key_event.key)? {
-        KittyFunctionalKey::CsiLetter(letter) => {
+        KittyFunctionalKey::Letter(letter) => {
             if let Some(modifier_field) = modifier_field {
                 Some(format!("\x1b[1;{modifier_field}{}", letter as char).into_bytes())
             } else {
                 Some(format!("\x1b[{}", letter as char).into_bytes())
             }
         }
-        KittyFunctionalKey::CsiTilde(number) => {
+        KittyFunctionalKey::Tilde(number) => {
             if let Some(modifier_field) = modifier_field {
                 Some(format!("\x1b[{number};{modifier_field}~").into_bytes())
             } else {
                 Some(format!("\x1b[{number}~").into_bytes())
             }
         }
-        KittyFunctionalKey::CsiUnicode(codepoint) => {
+        KittyFunctionalKey::Unicode(codepoint) => {
             Some(kitty_csi_u(codepoint, key_event, flags, event_type))
         }
     }

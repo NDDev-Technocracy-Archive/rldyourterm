@@ -462,6 +462,10 @@ fn build_gui_window_attributes(
             attributes = attributes.with_activation_token(token);
         }
     }
+    // The application id and the activation token only exist on Wayland/X11;
+    // elsewhere both parameters are intentionally unused.
+    #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
+    let _ = (event_loop, application_id);
 
     attributes
 }

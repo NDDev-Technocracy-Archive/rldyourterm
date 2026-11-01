@@ -23,7 +23,7 @@ pub use palette::{
     dispatch_runtime_palette_command, handle_runtime_palette_key_input, runtime_palette_info_line,
     runtime_palette_status_line, toggle_runtime_palette,
 };
-pub use rldyourterm_core::{
+pub use rldyourterm_services::terminal::{
     RuntimeKey, RuntimeKeyEvent, RuntimeKeyEventKind, RuntimeKeyModifiers, TerminalModeFlags,
     encode_runtime_key_event,
 };

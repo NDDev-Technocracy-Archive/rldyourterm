@@ -105,9 +105,9 @@ impl Parser {
 
     fn parse_standard_csi_action(&self, params_raw: &[u8], final_byte: u8) -> Option<ParserAction> {
         if final_byte == b'm' {
-            return Some(ParserAction::SetGraphicsRendition(
+            return Some(ParserAction::SetGraphicsRendition(Box::new(
                 parse_sgr_params(params_raw).ok()?,
-            ));
+            )));
         }
 
         let parsed = parse_params(params_raw).ok()?;

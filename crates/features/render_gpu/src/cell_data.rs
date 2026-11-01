@@ -54,9 +54,9 @@ pub(super) fn pack_cell_flags(slot: u16, attrs: &super::Attrs) -> u32 {
 
 fn glyph_key_for_cell(cell: &Cell) -> Option<GlyphKey> {
     match cell.text() {
-        CellText::Char(ch) if ch == ' ' => None,
+        CellText::Char(' ') => None,
         CellText::Char(ch) => Some(GlyphKey::from(ch)),
-        CellText::Text(text) if text == " " => None,
+        CellText::Text(" ") => None,
         CellText::Text(text) => Some(GlyphKey::from(text)),
     }
 }

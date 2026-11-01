@@ -7,3 +7,10 @@ pub use rldyourterm_core::{
     MouseFormat, MouseMode, Parser, SearchError, SearchMatch, TerminalState, TerminalTheme,
     UnderlineStyle, color_to_u32,
 };
+// Key encoding lives in the engine; features reach it through this layer, as
+// the VSA dependency graph (scripts/ci/validate_vsa_dependency_graph.sh)
+// allows features -> services -> core but not features -> core.
+pub use rldyourterm_core::{
+    RuntimeKey, RuntimeKeyEvent, RuntimeKeyEventKind, RuntimeKeyModifiers, TerminalModeFlags,
+    encode_runtime_key_event,
+};
