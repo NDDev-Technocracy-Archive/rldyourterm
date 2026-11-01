@@ -1,33 +1,50 @@
 name: ClusterFuzzLite batch fuzzing
 
-# Scheduled ClusterFuzzLite batch fuzzing. Replaces the bespoke cflite_batch.yml
-# with the reusable clusterfuzzlite.yml in NDDev-it-com/ci-workflows (pinned to
-# a SHA).
+# Batch fuzzing as the repository's own job. This file used to call the
+# retired NDDev-it-com/ci-workflows clusterfuzzlite.yml and every run failed
+# before starting; the job below restores the direct ClusterFuzzLite steps
+# the repository ran before that migration (cflite_batch.yml at 47a5256^).
+#
+# On demand only: the weekly schedule is dropped for this archived project,
+# as for soak.yml.
 
 on:
-  schedule:
-    - cron: "0 3 * * 0" # Weekly on Sunday at 03:00 UTC
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  contents: read
 
 concurrency:
-  group: cflite-batch-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: cflite-batch-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   batch-fuzzing:
     name: Batch fuzzing
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
     permissions:
+      # ClusterFuzzLite reads earlier run artifacts and uploads its SARIF.
       actions: read
       contents: read
       security-events: write
-    uses: NDDev-it-com/ci-workflows/.github/workflows/clusterfuzzlite.yml@b05016e27151e2d5b3f07e1d856fff50f635ab15
-    with:
-      runner: ubuntu-24.04
-      mode: batch
-      language: rust
-      sanitizer_matrix: '["address"]'
-      fuzz_seconds: 1800
-      output_sarif: true
-      timeout_minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build fuzzers
+        uses: google/clusterfuzzlite/actions/build_fuzzers@52ecc61cb587ee99c26825a112a21abf19c7448c # 2024-09-19
+        with:
+          language: rust
+          github-token: ${{ github.token }}
+          sanitizer: address
+
+      - name: Run batch fuzzing
+        uses: google/clusterfuzzlite/actions/run_fuzzers@52ecc61cb587ee99c26825a112a21abf19c7448c # 2024-09-19
+        with:
+          github-token: ${{ github.token }}
+          fuzz-seconds: 1800
+          mode: batch
+          sanitizer: address
+          output-sarif: true

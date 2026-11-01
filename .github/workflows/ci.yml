@@ -56,7 +56,7 @@ jobs:
       run: |
         rustup toolchain install 1.94.0 --profile minimal --component clippy,rustfmt
         echo RUSTUP_TOOLCHAIN=1.94.0 >> "$GITHUB_ENV"
-    - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/hosted-cache@ab62f45b2a3067e5a7425d703f7fd07f1618b72c # nddev-cicd-v0.6.14
+    - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/hosted-cache@6025c89a373edb6f9af17aae2f0c5a5812c05300 # nddev-cicd-v0.6.21
       with:
         ecosystems: cargo
     - name: Format
@@ -126,7 +126,7 @@ jobs:
       run: |
         rustup toolchain install 1.94.0 --profile minimal
         echo RUSTUP_TOOLCHAIN=1.94.0 >> "$GITHUB_ENV"
-    - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/tools@ab62f45b2a3067e5a7425d703f7fd07f1618b72c # nddev-cicd-v0.6.14
+    - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/tools@6025c89a373edb6f9af17aae2f0c5a5812c05300 # nddev-cicd-v0.6.21
       with:
         capability: rust
     - name: Supply chain
@@ -142,13 +142,13 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/tools@ab62f45b2a3067e5a7425d703f7fd07f1618b72c # nddev-cicd-v0.6.14
+      - uses: NDDev-Technocracy-Standarts/std-0004-ci-cd-workflows/.github/actions/tools@6025c89a373edb6f9af17aae2f0c5a5812c05300 # nddev-cicd-v0.6.21
         with:
           capability: security
       - name: Lint and audit workflows
         run: |
-          actionlint .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml
-          zizmor --offline --no-progress .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml .github/dependabot.yml
+          actionlint .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml .github/workflows/security.yml .github/workflows/fuzzing-batch.yml
+          zizmor --offline --no-progress .github/workflows/ci.yml .github/workflows/branch-protection-contract.yml .github/workflows/soak.yml .github/workflows/security.yml .github/workflows/fuzzing-batch.yml .github/dependabot.yml
       - name: Scan new pull request commits, or the full history on main
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
