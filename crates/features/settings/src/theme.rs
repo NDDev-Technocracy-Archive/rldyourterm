@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 Danil Silantyev, Global CEO NDDev. on.nddev.it.com (OpenNetwork)
 
-use rldyourterm_core::{ANSI_PALETTE, TerminalTheme};
+use rldyourterm_services::terminal::{ANSI_PALETTE, TerminalTheme};
 
 use crate::ThemePreset;
 

@@ -2,7 +2,7 @@
 // Copyright (C) 2026 Danil Silantyev, Global CEO NDDev. on.nddev.it.com (OpenNetwork)
 
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use rldyourterm_core::{
+use rldyourterm_services::terminal::{
     RuntimeKey, RuntimeKeyEvent, RuntimeKeyEventKind, RuntimeKeyModifiers, TerminalModeFlags,
     encode_runtime_key_event,
 };
@@ -452,7 +452,7 @@ mod tests {
         runtime_key_from_winit_borrowed,
     };
     use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-    use rldyourterm_core::{
+    use rldyourterm_services::terminal::{
         RuntimeKey, RuntimeKeyEventKind, RuntimeKeyModifiers, TerminalModeFlags,
     };
     use winit::keyboard::{Key, ModifiersState, NamedKey, SmolStr};

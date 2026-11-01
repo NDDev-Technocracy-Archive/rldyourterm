@@ -2076,7 +2076,6 @@ name = "rldyourterm-interaction"
 version = "0.1.0"
 dependencies = [
  "crossterm",
- "rldyourterm-core",
  "rldyourterm-services",
  "rldyourterm-settings",
  "tracing",
@@ -2119,7 +2118,6 @@ dependencies = [
 name = "rldyourterm-settings"
 version = "0.1.0"
 dependencies = [
- "rldyourterm-core",
  "rldyourterm-services",
  "serde",
  "tracing",
