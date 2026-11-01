@@ -2005,7 +2005,6 @@ dependencies = [
  "rldyourterm-settings",
  "rldyourterm-shell-integration",
  "rldyourterm-ui",
- "softbuffer",
  "tracing",
  "tracing-subscriber",
  "unicode-width",
