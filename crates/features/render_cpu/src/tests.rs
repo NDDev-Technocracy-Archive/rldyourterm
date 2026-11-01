@@ -367,9 +367,7 @@ fn pixel_renderer_draws_search_overlay_row_with_inverse_cells() {
 
     let overlay_offset = width * CELL_HEIGHT;
     assert!(
-        buffer[overlay_offset..]
-            .iter()
-            .any(|pixel| *pixel == DEFAULT_FG_U32),
+        buffer[overlay_offset..].contains(&DEFAULT_FG_U32),
         "overlay row must paint the reserved bottom row with inverse background"
     );
 }

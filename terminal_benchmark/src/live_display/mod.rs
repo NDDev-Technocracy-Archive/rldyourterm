@@ -56,11 +56,12 @@ enum ScenarioKind {
     ResizeCycle,
 }
 
+/// PTY reader events forwarded into the live display event loop.
 #[derive(Debug, Clone)]
 enum LiveDisplayEvent {
-    PtyOutput(Vec<u8>),
-    PtyClosed,
-    PtyFailure(String),
+    Output(Vec<u8>),
+    Closed,
+    Failure(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -992,8 +993,8 @@ impl ApplicationHandler<LiveDisplayEvent> for LiveDisplayApp {
 
     fn user_event(&mut self, event_loop: &ActiveEventLoop, event: LiveDisplayEvent) {
         match event {
-            LiveDisplayEvent::PtyOutput(bytes) => self.handle_input_latency_output(bytes),
-            LiveDisplayEvent::PtyClosed => {
+            LiveDisplayEvent::Output(bytes) => self.handle_input_latency_output(bytes),
+            LiveDisplayEvent::Closed => {
                 if matches!(self.scenario_kind, ScenarioKind::InputLatency)
                     && self.pending_input_started_at.is_some()
                     && !self.input_latency_output_observed
@@ -1006,7 +1007,7 @@ impl ApplicationHandler<LiveDisplayEvent> for LiveDisplayApp {
                     );
                 }
             }
-            LiveDisplayEvent::PtyFailure(message) => {
+            LiveDisplayEvent::Failure(message) => {
                 self.finish_error(
                     event_loop,
                     anyhow::anyhow!("input latency PTY reader failed: {message}"),
@@ -1158,12 +1159,12 @@ fn spawn_input_latency_reader_thread(
             loop {
                 match reader.read(&mut buffer) {
                     Ok(0) => {
-                        let _ = event_proxy.send_event(LiveDisplayEvent::PtyClosed);
+                        let _ = event_proxy.send_event(LiveDisplayEvent::Closed);
                         break;
                     }
                     Ok(read) => {
                         if event_proxy
-                            .send_event(LiveDisplayEvent::PtyOutput(buffer[..read].to_vec()))
+                            .send_event(LiveDisplayEvent::Output(buffer[..read].to_vec()))
                             .is_err()
                         {
                             break;
@@ -1172,7 +1173,7 @@ fn spawn_input_latency_reader_thread(
                     Err(error) if error.kind() == ErrorKind::Interrupted => continue,
                     Err(error) => {
                         let _ =
-                            event_proxy.send_event(LiveDisplayEvent::PtyFailure(error.to_string()));
+                            event_proxy.send_event(LiveDisplayEvent::Failure(error.to_string()));
                         break;
                     }
                 }
