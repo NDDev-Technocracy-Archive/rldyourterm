@@ -437,6 +437,12 @@ fn parse_rgb_triplet(spec: &str, separator: char) -> Option<(u8, u8, u8)> {
 }
 
 fn parse_hash_triplet(spec: &str) -> Option<(u8, u8, u8)> {
+    // Only hex digits are valid, and checking first also keeps the byte
+    // slicing below on character boundaries: a multibyte character in an
+    // untrusted OSC payload would otherwise make it panic.
+    if !spec.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+        return None;
+    }
     let component_len = spec.len() / 3;
     if spec.is_empty() || !spec.len().is_multiple_of(3) || !(1..=4).contains(&component_len) {
         return None;
